@@ -1,6 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
+red = '#c0392b'
+blue = '#2980b9'
+green = '#2ecc71'
 
 def plot_function(ax, x, y, title, xlabel, ylabel):
     ax.plot(x, y, 'b-')
@@ -28,52 +31,71 @@ def plot_hist(ax, ys, title, xlabel):
 #         plot_function(ax, range(len(values)), values, title, xlabel, ylabel)
 
 def plot_expected_loss(parameters, losses):
-    plt.plot(parameters, losses, 'b-')
+    plt.figure(figsize=(20, 5))
+    plt.plot(parameters, losses, color=red)
     plt.title('Expected Loss')
     plt.xlabel('$\\theta$')
     plt.ylabel('$\mathcal{L}(\\theta)$')
     plt.grid()
     plt.show()
 
-def plot_results(losses, thetas, grads):
+def plot_results(losses, thetas=None, grads=None):
     fig = plt.figure(figsize=(20, 3))
 
     plt.subplot(131)
-    plt.plot(losses)
+    plt.plot(losses, color=red)
     plt.title('Loss function')
     plt.xlabel('Epoch')
     plt.ylabel('$\\mathcal{L}(\\theta)$')
     plt.grid()
 
-    plt.subplot(132)
-    plt.plot(thetas)
-    plt.title('Parameter $\\theta$')
-    plt.xlabel('Epoch')
-    plt.ylabel('$\\theta$')
-    plt.grid()
+    if thetas is not None:
+        plt.subplot(132)
+        if not isinstance(thetas, np.ndarray):
+            thetas = [thetas]
+        for i, params in enumerate(thetas):
+            plt.plot(params, color=green)
+        plt.title('Parameter $\\theta$')
+        plt.xlabel('Epoch')
+        plt.ylabel('$\\theta$')
+        plt.grid()
 
-    plt.subplot(133)
-    plt.plot(grads)
-    plt.title('Gradient $\\nabla_{\\theta} \\mathcal{L}(\\theta)$')
-    plt.xlabel('Epoch')
-    plt.ylabel('$\\nabla_{\\theta} \\mathcal{L}$')
-    plt.grid()
+    if grads is not None:
+        plt.subplot(133)
+        plt.plot(grads, color=blue)
+        plt.title('Gradient $\\nabla_{\\theta} \\mathcal{L}(\\theta)$')
+        plt.xlabel('Epoch')
+        plt.ylabel('$\\nabla_{\\theta} \\mathcal{L}$')
+        plt.grid()
 
     plt.show()
 
 
 # 1-step Navigation 
 
-def plot_loss_function(ax, losses, epoch, title=None):
-    ax.plot(losses, 'b-')
-    ax.set_xlim(0, epoch)
+def build_initial_state(x0, y0, batch_size):
+    x_init = np.full([batch_size], x0, np.float32)
+    y_init = np.full([batch_size], y0, np.float32)
+    initial_state   = np.stack([x_init, y_init], axis=1)
+    return initial_state
+
+def build_timesteps(batch_size, max_time):
+    timesteps = [np.arange(start=1.0, stop=max_time + 1.0, dtype=np.float32)]
+    timesteps = np.repeat(timesteps, batch_size, axis=0)
+    timesteps = np.reshape(timesteps, (batch_size, max_time, 1))
+    return timesteps
+
+
+def plot_loss_function(losses, epoch, title=None):
+    plt.plot(losses, 'b-')
+    plt.xlim(0, epoch)
     if title is None:
-        ax.set_title('Loss function')
+        plt.title('Loss function')
     else:
-        ax.set_title('Loss function ({})'.format(title))
-    ax.set_xlabel("# iterations")
-    ax.set_ylabel("loss")
-    ax.grid()
+        plt.title('Loss function ({})'.format(title))
+    plt.xlabel("# iterations")
+    plt.ylabel("loss")
+    plt.grid()
 
 def plot_grid(ax, grid):
     xlim, ylim = grid['size']
@@ -84,7 +106,10 @@ def plot_grid(ax, grid):
     ax.grid()
     
 
-def plot_policy(ax, grid, action, states):
+def plot_policy(grid, action, states, ax=None):
+    
+    if ax is None:
+        ax = plt.gca()
     
     start = grid['start']
     end = grid['goal']
