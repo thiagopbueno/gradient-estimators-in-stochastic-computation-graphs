@@ -43,10 +43,9 @@ class MDP_RNNCell(tf.nn.rnn_cell.RNNCell):
     
 class MDP_RNN(object):
     
-    def __init__(self, mdp, policy, batch_size=1):
+    def __init__(self, mdp, policy):
         self.cell = MDP_RNNCell(mdp, policy)
         self.graph = mdp.graph
-        self.batch_size = batch_size
     
     def unroll(self, initial_state, timesteps):
 
@@ -60,11 +59,11 @@ class MDP_RNN(object):
             
             # timesteps
             inputs = tf.placeholder_with_default(tf.constant(timesteps, name='timesteps'),
-                                                 shape=(self.batch_size, max_time, 1),
+                                                 shape=(None, max_time, 1),
                                                  name='inputs')
             # initial cell state
             initial_state = tf.placeholder_with_default(tf.constant(initial_state),
-                                                        shape=(self.batch_size, self.cell.state_size),
+                                                        shape=(None, self.cell.state_size),
                                                         name='initial_state')
 
             # dynamic time unrolling
