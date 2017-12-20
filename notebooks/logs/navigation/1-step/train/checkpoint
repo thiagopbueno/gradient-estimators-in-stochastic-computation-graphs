@@ -1,2 +1,0 @@
-model_checkpoint_path: "/Users/thiagopbueno/Projects/jupyter-notebooks/gradient-estimators/notebooks/logs/navigation/1-step/train/model.ckpt"
-all_model_checkpoint_paths: "/Users/thiagopbueno/Projects/jupyter-notebooks/gradient-estimators/notebooks/logs/navigation/1-step/train/model.ckpt"
